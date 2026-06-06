@@ -20,6 +20,9 @@ interface PremiumCardProps {
 }
 
 // ─── Per-variant config ───────────────────────────────────────────────────────
+// The source image (1448×1086) has Judge on the left half and Messi on the right.
+// backgroundSize:'200% auto' renders the image at 2× card width.
+// backgroundPosition '0% top' = left half (Judge), '100% top' = right half (Messi).
 
 const VARIANTS = {
   baseball: {
@@ -27,32 +30,35 @@ const VARIANTS = {
     accentHex2:  '#f5c842',
     accentRGB:   '201, 169, 110',
     accentRGB2:  '245, 200, 66',
-    bgGradient:  'linear-gradient(170deg, #120800 0%, #1e1200 25%, #0f0800 55%, #050300 100%)',
-    spotGrad:    'radial-gradient(ellipse 55% 65% at 50% 25%, rgba(255,190,60,0.18) 0%, transparent 70%)',
-    groundGrad:  'radial-gradient(ellipse 90% 35% at 50% 100%, rgba(180,110,0,0.28) 0%, transparent 55%)',
-    borderGlow:  'rgba(201,169,110,0.7)',
-    shadowGlow:  '0 0 60px rgba(201,169,110,0.35), 0 0 120px rgba(201,169,110,0.15)',
+    // Image crop: left half = Aaron Judge
+    imgPosition: '0% top',
+    // Dark tint layers to keep text readable while showing photo underneath
+    topOverlay:  'linear-gradient(to bottom, rgba(8,4,0,0.72) 0%, rgba(8,4,0,0.2) 35%, transparent 60%)',
+    botOverlay:  'linear-gradient(to top, rgba(8,4,0,0.95) 0%, rgba(8,4,0,0.6) 35%, transparent 65%)',
+    // Accent color overlays
+    spotGrad:    'radial-gradient(ellipse 60% 50% at 50% 20%, rgba(255,190,60,0.14) 0%, transparent 70%)',
+    borderGlow:  'rgba(201,169,110,0.8)',
+    shadowGlow:  '0 0 50px rgba(201,169,110,0.45), 0 0 100px rgba(201,169,110,0.2), 0 30px 80px rgba(0,0,0,0.8)',
     typeColor:   '#f5c842',
-    typeLabel:   'LEGEND',
-    holoColors:  ['255,180,0', '255,100,0', '200,50,0'],
-    teamInitial: 'NY',
+    holoColors:  ['255,180,0', '255,120,0', '200,80,0'],
     teamSymbol:  '⚾',
+    teamInitial: 'NY',
     energyLines: [
-      { x1: '8%',  y1: '88%', x2: '38%', y2: '22%' },
-      { x1: '65%', y1: '82%', x2: '88%', y2: '35%' },
-      { x1: '20%', y1: '70%', x2: '45%', y2: '40%' },
-      { x1: '75%', y1: '75%', x2: '55%', y2: '45%' },
+      { x1: '8%',  y1: '90%', x2: '32%', y2: '20%' },
+      { x1: '70%', y1: '85%', x2: '90%', y2: '30%' },
+      { x1: '18%', y1: '72%', x2: '42%', y2: '42%' },
+      { x1: '78%', y1: '68%', x2: '58%', y2: '48%' },
     ],
     particles: [
-      { x: '15%', y: '30%', size: 3, delay: 0    },
-      { x: '82%', y: '25%', size: 2, delay: 0.4  },
-      { x: '10%', y: '55%', size: 2, delay: 0.8  },
-      { x: '88%', y: '50%', size: 3, delay: 1.2  },
-      { x: '30%', y: '20%', size: 1.5, delay: 0.6 },
-      { x: '70%', y: '18%', size: 2, delay: 1.0  },
-      { x: '50%', y: '12%', size: 1, delay: 0.2  },
-      { x: '22%', y: '42%', size: 1.5, delay: 1.4 },
-      { x: '78%', y: '60%', size: 2, delay: 0.9  },
+      { x: '12%', y: '28%', size: 3,   delay: 0    },
+      { x: '85%', y: '24%', size: 2.5, delay: 0.4  },
+      { x: '8%',  y: '52%', size: 2,   delay: 0.8  },
+      { x: '90%', y: '48%', size: 3,   delay: 1.2  },
+      { x: '28%', y: '16%', size: 1.5, delay: 0.6  },
+      { x: '72%', y: '14%', size: 2,   delay: 1.0  },
+      { x: '50%', y: '10%', size: 1,   delay: 0.2  },
+      { x: '20%', y: '40%', size: 1.5, delay: 1.4  },
+      { x: '80%', y: '60%', size: 2,   delay: 0.9  },
     ],
   },
   soccer: {
@@ -60,85 +66,37 @@ const VARIANTS = {
     accentHex2:  '#00e5ff',
     accentRGB:   '74, 184, 255',
     accentRGB2:  '0, 229, 255',
-    bgGradient:  'linear-gradient(170deg, #000510 0%, #000d20 25%, #000518 55%, #000208 100%)',
-    spotGrad:    'radial-gradient(ellipse 55% 65% at 50% 25%, rgba(0,140,255,0.22) 0%, transparent 70%)',
-    groundGrad:  'radial-gradient(ellipse 90% 35% at 50% 100%, rgba(0,80,220,0.3) 0%, transparent 55%)',
-    borderGlow:  'rgba(74,184,255,0.75)',
-    shadowGlow:  '0 0 60px rgba(74,184,255,0.4), 0 0 120px rgba(0,100,255,0.2)',
+    // Image crop: right half = Lionel Messi
+    imgPosition: '100% top',
+    topOverlay:  'linear-gradient(to bottom, rgba(0,4,14,0.72) 0%, rgba(0,4,14,0.2) 35%, transparent 60%)',
+    botOverlay:  'linear-gradient(to top, rgba(0,4,14,0.95) 0%, rgba(0,4,14,0.6) 35%, transparent 65%)',
+    spotGrad:    'radial-gradient(ellipse 60% 50% at 50% 20%, rgba(0,140,255,0.18) 0%, transparent 70%)',
+    borderGlow:  'rgba(74,184,255,0.85)',
+    shadowGlow:  '0 0 50px rgba(74,184,255,0.5), 0 0 100px rgba(0,100,255,0.25), 0 30px 80px rgba(0,0,0,0.8)',
     typeColor:   '#00e5ff',
-    typeLabel:   'ICON',
-    holoColors:  ['0,200,255', '0,100,255', '100,0,255'],
-    teamInitial: 'FCB',
+    holoColors:  ['0,200,255', '0,100,255', '80,0,255'],
     teamSymbol:  '⚽',
+    teamInitial: 'FCB',
     energyLines: [
-      { x1: '5%',  y1: '85%', x2: '35%', y2: '18%' },
-      { x1: '68%', y1: '80%', x2: '92%', y2: '28%' },
-      { x1: '15%', y1: '65%', x2: '42%', y2: '38%' },
-      { x1: '78%', y1: '70%', x2: '58%', y2: '42%' },
+      { x1: '5%',  y1: '88%', x2: '30%', y2: '18%' },
+      { x1: '72%', y1: '83%', x2: '94%', y2: '26%' },
+      { x1: '15%', y1: '68%', x2: '40%', y2: '40%' },
+      { x1: '80%', y1: '72%', x2: '60%', y2: '44%' },
     ],
     particles: [
-      { x: '12%', y: '28%', size: 3,   delay: 0    },
-      { x: '85%', y: '22%', size: 2.5, delay: 0.3  },
-      { x: '8%',  y: '52%', size: 2,   delay: 0.7  },
-      { x: '90%', y: '48%', size: 3,   delay: 1.1  },
-      { x: '28%', y: '18%', size: 1.5, delay: 0.5  },
-      { x: '72%', y: '15%', size: 2,   delay: 0.9  },
-      { x: '50%', y: '10%', size: 1.5, delay: 0.15 },
-      { x: '20%', y: '40%', size: 1,   delay: 1.3  },
-      { x: '80%', y: '58%', size: 2,   delay: 0.8  },
-      { x: '60%', y: '32%', size: 1.5, delay: 1.6  },
+      { x: '10%', y: '26%', size: 3,   delay: 0    },
+      { x: '88%', y: '22%', size: 2.5, delay: 0.3  },
+      { x: '6%',  y: '50%', size: 2,   delay: 0.7  },
+      { x: '92%', y: '46%', size: 3,   delay: 1.1  },
+      { x: '26%', y: '14%', size: 1.5, delay: 0.5  },
+      { x: '74%', y: '12%', size: 2,   delay: 0.9  },
+      { x: '50%', y: '8%',  size: 1.5, delay: 0.15 },
+      { x: '22%', y: '38%', size: 1,   delay: 1.3  },
+      { x: '82%', y: '56%', size: 2,   delay: 0.8  },
+      { x: '62%', y: '30%', size: 1.5, delay: 1.6  },
     ],
   },
 } as const;
-
-// ─── Athlete silhouettes ──────────────────────────────────────────────────────
-
-function BatterSilhouette({ color }: { color: string }) {
-  return (
-    <svg viewBox="0 0 240 385" fill="none" stroke={color} strokeLinecap="round" strokeLinejoin="round"
-      style={{ filter: `drop-shadow(0 0 18px ${color}) drop-shadow(0 0 40px ${color}88)` }}>
-      <circle cx="118" cy="37" r="23" fill={color} stroke="none" />
-      <path d="M97 30 Q78 22 70 34 Q67 44 78 48 L96 44" fill={color} stroke="none" />
-      <line x1="118" y1="60" x2="116" y2="74" strokeWidth="14" />
-      <line x1="130" y1="88" x2="168" y2="68" strokeWidth="16" />
-      <line x1="168" y1="68" x2="200" y2="56" strokeWidth="13" />
-      <line x1="106" y1="90" x2="74"  y2="96" strokeWidth="16" />
-      <line x1="74"  y1="96" x2="52"  y2="106" strokeWidth="13" />
-      <line x1="50"  y1="108" x2="204" y2="54" strokeWidth="9" />
-      <line x1="116" y1="74" x2="126" y2="160" strokeWidth="32" />
-      <line x1="112" y1="160" x2="88"  y2="248" strokeWidth="24" />
-      <line x1="88"  y1="248" x2="74"  y2="328" strokeWidth="22" />
-      <line x1="74"  y1="328" x2="36"  y2="334" strokeWidth="16" />
-      <line x1="138" y1="158" x2="164" y2="248" strokeWidth="24" />
-      <line x1="164" y1="248" x2="174" y2="328" strokeWidth="22" />
-      <line x1="174" y1="328" x2="214" y2="336" strokeWidth="16" />
-    </svg>
-  );
-}
-
-function SoccerSilhouette({ color }: { color: string }) {
-  return (
-    <svg viewBox="0 0 250 390" fill="none" stroke={color} strokeLinecap="round" strokeLinejoin="round"
-      style={{ transform: 'scaleX(-1)', filter: `drop-shadow(0 0 18px ${color}) drop-shadow(0 0 40px ${color}88)` }}>
-      <circle cx="95" cy="32" r="21" fill={color} stroke="none" />
-      <line x1="95" y1="53" x2="93" y2="67" strokeWidth="13" />
-      <line x1="93" y1="67" x2="96" y2="152" strokeWidth="30" />
-      <line x1="78" y1="90" x2="46" y2="73" strokeWidth="14" />
-      <line x1="46" y1="73" x2="30" y2="84" strokeWidth="12" />
-      <line x1="116" y1="88" x2="150" y2="74" strokeWidth="14" />
-      <line x1="150" y1="74" x2="166" y2="84" strokeWidth="12" />
-      <line x1="80"  y1="152" x2="66"  y2="242" strokeWidth="23" />
-      <line x1="66"  y1="242" x2="58"  y2="326" strokeWidth="21" />
-      <line x1="58"  y1="326" x2="20"  y2="332" strokeWidth="15" />
-      <line x1="100" y1="152" x2="154" y2="112" strokeWidth="23" />
-      <line x1="154" y1="112" x2="205" y2="128" strokeWidth="21" />
-      <line x1="205" y1="128" x2="226" y2="137" strokeWidth="15" />
-      <circle cx="238" cy="150" r="18" strokeWidth="5" />
-      <path d="M224 141 Q238 150 224 159" strokeWidth="2.5" />
-      <path d="M252 141 Q238 150 252 159" strokeWidth="2.5" />
-    </svg>
-  );
-}
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
@@ -153,64 +111,48 @@ export function PremiumCard({
   const shineRef = useRef<HTMLDivElement>(null);
   const glowRef  = useRef<HTMLDivElement>(null);
 
-  // ── Breathing glow ──────────────────────────────────────────────────────────
+  // Breathing glow
   useEffect(() => {
     const glow = glowRef.current;
     if (!glow) return;
-
-    gsap.to(glow, {
-      opacity: 0.7,
-      duration: 2.2,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut',
-    });
+    gsap.to(glow, { opacity: 0.75, duration: 2.2, repeat: -1, yoyo: true, ease: 'sine.inOut' });
   }, []);
 
-  // ── Mouse tracking: 3D tilt + holographic shine ─────────────────────────────
+  // Mouse tracking: 3D tilt + holographic shine
   const onMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const wrap = wrapRef.current;
-    const card = cardRef.current;
-    const holo = holoRef.current;
+    const wrap  = wrapRef.current;
+    const card  = cardRef.current;
+    const holo  = holoRef.current;
     const shine = shineRef.current;
     if (!wrap || !card || !holo || !shine) return;
 
     const rect = wrap.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;   // -0.5 → 0.5
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top)  / rect.height - 0.5;
 
-    // 3D tilt
-    gsap.to(card, {
-      rotateY:  x * 28,
-      rotateX: -y * 22,
-      duration: 0.3,
-      ease: 'power2.out',
-    });
+    gsap.to(card, { rotateY: x * 28, rotateX: -y * 22, duration: 0.3, ease: 'power2.out' });
 
-    // Holographic gradient angle
     const angle = Math.round((Math.atan2(y, x) * 180) / Math.PI) + 180;
     const px = ((x + 0.5) * 100).toFixed(1);
     const py = ((y + 0.5) * 100).toFixed(1);
     holo.style.background = `
       radial-gradient(circle at ${px}% ${py}%,
-        rgba(${cfg.holoColors[0]}, 0.18) 0%,
-        rgba(${cfg.holoColors[1]}, 0.12) 25%,
-        rgba(${cfg.holoColors[2]}, 0.08) 50%,
-        rgba(255,255,255,0.04) 75%,
+        rgba(${cfg.holoColors[0]}, 0.22) 0%,
+        rgba(${cfg.holoColors[1]}, 0.14) 30%,
+        rgba(${cfg.holoColors[2]}, 0.08) 60%,
         transparent 100%),
       linear-gradient(${angle}deg,
-        rgba(${cfg.accentRGB}, 0.1) 0%,
-        transparent 30%,
-        rgba(${cfg.accentRGB2}, 0.08) 60%,
+        rgba(${cfg.accentRGB}, 0.12) 0%,
+        transparent 35%,
+        rgba(${cfg.accentRGB2}, 0.10) 65%,
         transparent 100%)
     `;
     holo.style.opacity = '1';
 
-    // Moving shine streak
     gsap.to(shine, {
       left: `${(x + 0.5) * 120 - 10}%`,
       top:  `${(y + 0.5) * 120 - 10}%`,
-      opacity: 0.6,
+      opacity: 0.65,
       duration: 0.2,
     });
   }, [cfg]);
@@ -220,8 +162,7 @@ export function PremiumCard({
     const holo  = holoRef.current;
     const shine = shineRef.current;
     if (!card || !holo || !shine) return;
-
-    gsap.to(card, { rotateY: 0, rotateX: 0, duration: 0.9, ease: 'elastic.out(1, 0.4)' });
+    gsap.to(card,  { rotateY: 0, rotateX: 0, scale: 1, duration: 0.9, ease: 'elastic.out(1,0.4)' });
     gsap.to(holo,  { opacity: 0, duration: 0.5 });
     gsap.to(shine, { opacity: 0, duration: 0.4 });
   }, []);
@@ -229,15 +170,8 @@ export function PremiumCard({
   const onMouseEnter = useCallback(() => {
     const card = cardRef.current;
     if (!card) return;
-    gsap.to(card, { scale: 1.03, duration: 0.3, ease: 'power2.out' });
+    gsap.to(card, { scale: 1.04, duration: 0.3, ease: 'power2.out' });
   }, []);
-
-  const onMouseLeaveOuter = useCallback(() => {
-    const card = cardRef.current;
-    if (!card) return;
-    gsap.to(card, { scale: 1, duration: 0.5, ease: 'elastic.out(1, 0.4)' });
-    onMouseLeave();
-  }, [onMouseLeave]);
 
   return (
     <div
@@ -246,39 +180,46 @@ export function PremiumCard({
       style={{ perspective: '1000px', perspectiveOrigin: '50% 50%' }}
       onMouseMove={onMouseMove}
       onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeaveOuter}
+      onMouseLeave={onMouseLeave}
     >
       {/* Outer breathing glow halo */}
       <div
         ref={glowRef}
-        className="absolute -inset-6 rounded-[24px] pointer-events-none opacity-40"
+        className="absolute -inset-6 rounded-[24px] pointer-events-none opacity-35"
         style={{
-          background: `radial-gradient(ellipse 80% 80% at 50% 50%, rgba(${cfg.accentRGB}, 0.25) 0%, transparent 70%)`,
-          filter: 'blur(20px)',
+          background: `radial-gradient(ellipse 85% 85% at 50% 50%, rgba(${cfg.accentRGB}, 0.3) 0%, transparent 65%)`,
+          filter: 'blur(22px)',
         }}
       />
 
       {/* Card body */}
       <div
         ref={cardRef}
-        className="relative overflow-hidden rounded-[14px]"
+        className="relative overflow-hidden rounded-[16px]"
         style={{
           width: '100%',
           aspectRatio: '2.5 / 3.5',
           transformStyle: 'preserve-3d',
           willChange: 'transform',
-          background: cfg.bgGradient,
           boxShadow: cfg.shadowGlow,
+          // ── Player photo as card background ──────────────────────────────
+          backgroundImage: 'url(/players.png)',
+          backgroundSize: '200% auto',
+          backgroundPosition: cfg.imgPosition,
+          backgroundRepeat: 'no-repeat',
         }}
       >
-        {/* Spotlight from above */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: cfg.spotGrad }} />
+        {/* Top text-readability gradient */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: cfg.topOverlay, zIndex: 2 }} />
 
-        {/* Ground reflection */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: cfg.groundGrad }} />
+        {/* Bottom text-readability gradient */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: cfg.botOverlay, zIndex: 2 }} />
+
+        {/* Accent color spotlight */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: cfg.spotGrad, zIndex: 3 }} />
 
         {/* Energy lines */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ opacity: 0.18 }}>
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 4, opacity: 0.22 }}>
           {cfg.energyLines.map((l, i) => (
             <line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2}
               stroke={cfg.accentHex} strokeWidth="1"
@@ -296,136 +237,125 @@ export function PremiumCard({
               left: p.x, top: p.y,
               width: p.size * 2, height: p.size * 2,
               background: cfg.accentHex2,
-              boxShadow: `0 0 ${p.size * 4}px ${cfg.accentHex2}`,
+              boxShadow: `0 0 ${p.size * 5}px ${p.size * 2}px ${cfg.accentHex2}88`,
               animation: `particlePulse ${1.4 + i * 0.2}s ease-in-out ${p.delay}s infinite`,
               transform: 'translate(-50%, -50%)',
+              zIndex: 5,
             }}
           />
         ))}
 
-        {/* Glowing border */}
+        {/* Glowing border frame */}
         <div
-          className="absolute inset-0 rounded-[14px] pointer-events-none"
+          className="absolute inset-0 rounded-[16px] pointer-events-none"
           style={{
             border: `2px solid ${cfg.borderGlow}`,
-            boxShadow: `inset 0 0 30px rgba(${cfg.accentRGB}, 0.12)`,
+            boxShadow: `inset 0 0 40px rgba(${cfg.accentRGB}, 0.15)`,
+            zIndex: 6,
           }}
         />
 
-        {/* Inner corner lights */}
-        {['top-0 left-0', 'top-0 right-0', 'bottom-0 left-0', 'bottom-0 right-0'].map((pos, i) => (
-          <div
-            key={i}
-            className={`absolute ${pos} w-8 h-8 pointer-events-none`}
-            style={{
-              background: `radial-gradient(circle at ${i % 2 === 0 ? '0% 0%' : '100% 0%'} , rgba(${cfg.accentRGB}, 0.5) 0%, transparent 70%)`,
-              transform: i >= 2 ? 'scaleY(-1)' : undefined,
-            }}
-          />
+        {/* Corner accent lights */}
+        {[
+          { cls: 'top-0 left-0',     origin: '0% 0%' },
+          { cls: 'top-0 right-0',    origin: '100% 0%' },
+          { cls: 'bottom-0 left-0',  origin: '0% 100%' },
+          { cls: 'bottom-0 right-0', origin: '100% 100%' },
+        ].map((c, i) => (
+          <div key={i} className={`absolute ${c.cls} w-10 h-10 pointer-events-none`} style={{
+            background: `radial-gradient(circle at ${c.origin}, rgba(${cfg.accentRGB}, 0.6) 0%, transparent 70%)`,
+            zIndex: 7,
+          }} />
         ))}
 
-        {/* ── Top row: Rating + Type + Team ── */}
-        <div className="absolute top-0 left-0 right-0 flex items-start justify-between px-3 pt-3 z-20">
-          {/* Rating block */}
+        {/* ── TOP ROW: Rating + Badge + Team ── */}
+        <div className="absolute top-0 left-0 right-0 flex items-start justify-between px-3 pt-3" style={{ zIndex: 10 }}>
           <div>
             <div
               className="font-display leading-none"
               style={{
-                fontSize: '3.2rem',
+                fontSize: '3rem',
                 fontWeight: 700,
-                background: `linear-gradient(180deg, #fff 20%, ${cfg.accentHex2} 100%)`,
+                background: `linear-gradient(170deg, #ffffff 20%, ${cfg.accentHex2} 100%)`,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                lineHeight: 1,
                 textShadow: 'none',
+                lineHeight: 1,
+                filter: `drop-shadow(0 0 8px rgba(${cfg.accentRGB},0.9))`,
               }}
             >
               {rating}
             </div>
-            <div
-              className="text-[0.5rem] font-semibold tracking-[0.2em] mt-0.5"
-              style={{ color: cfg.typeColor }}
-            >
+            <div className="text-[0.48rem] font-bold tracking-[0.22em] mt-0.5"
+              style={{ color: cfg.typeColor, textShadow: `0 0 10px ${cfg.typeColor}` }}>
               {cardType}
             </div>
           </div>
 
-          {/* Team symbol */}
-          <div className="flex flex-col items-center gap-1">
+          <div className="flex flex-col items-center gap-0.5">
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-base"
               style={{
-                background: `rgba(${cfg.accentRGB}, 0.15)`,
-                border: `1px solid rgba(${cfg.accentRGB}, 0.4)`,
-                color: cfg.accentHex2,
-                fontSize: '1.2rem',
+                background: `rgba(${cfg.accentRGB}, 0.18)`,
+                border: `1px solid rgba(${cfg.accentRGB}, 0.5)`,
+                backdropFilter: 'blur(4px)',
               }}
             >
               {cfg.teamSymbol}
             </div>
-            <span className="text-[0.45rem] font-bold tracking-wider" style={{ color: cfg.accentHex }}>
+            <span className="text-[0.42rem] font-bold tracking-wider" style={{ color: cfg.accentHex }}>
               {cfg.teamInitial}
             </span>
           </div>
         </div>
 
-        {/* ── Player silhouette ── */}
-        <div className="absolute inset-0 flex items-end justify-center pb-24 pointer-events-none z-10">
-          <div className="w-[78%] h-[68%]">
-            {variant === 'baseball'
-              ? <BatterSilhouette color={cfg.accentHex2} />
-              : <SoccerSilhouette color={cfg.accentHex2} />
-            }
-          </div>
-        </div>
-
-        {/* ── Bottom divider + info ── */}
-        <div className="absolute bottom-0 left-0 right-0 z-20 px-3 pb-3">
+        {/* ── BOTTOM INFO ── */}
+        <div className="absolute bottom-0 left-0 right-0 px-3 pb-3" style={{ zIndex: 10 }}>
           {/* Glowing divider */}
           <div className="w-full h-px mb-2" style={{
-            background: `linear-gradient(90deg, transparent, rgba(${cfg.accentRGB}, 0.7), transparent)`,
+            background: `linear-gradient(90deg, transparent, rgba(${cfg.accentRGB}, 0.8), transparent)`,
           }} />
 
           <div className="flex items-end justify-between">
             <div>
-              <p className="text-[0.55rem] font-medium tracking-[0.12em] uppercase" style={{ color: `rgba(${cfg.accentRGB}, 0.7)` }}>
+              <p className="text-[0.52rem] font-semibold tracking-[0.14em] uppercase"
+                style={{ color: `rgba(${cfg.accentRGB}, 0.8)` }}>
                 {firstName}
               </p>
-              <p
-                className="font-display font-bold leading-none"
+              <p className="font-display font-bold leading-none"
                 style={{
-                  fontSize: '1.4rem',
-                  background: `linear-gradient(180deg, #fff 30%, ${cfg.accentHex} 100%)`,
+                  fontSize: '1.5rem',
+                  background: `linear-gradient(170deg, #ffffff 30%, ${cfg.accentHex} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
-                }}
-              >
+                  filter: `drop-shadow(0 0 6px rgba(${cfg.accentRGB},0.7))`,
+                }}>
                 {lastName}
               </p>
-              <p className="text-[0.5rem] mt-0.5 font-medium tracking-wider" style={{ color: `rgba(${cfg.accentRGB}, 0.55)` }}>
+              <p className="text-[0.48rem] mt-0.5 font-medium tracking-wider"
+                style={{ color: `rgba(${cfg.accentRGB}, 0.6)` }}>
                 {team}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-[0.5rem] font-semibold tracking-widest" style={{ color: `rgba(${cfg.accentRGB}, 0.5)` }}>
+              <p className="text-[0.46rem] font-semibold tracking-widest"
+                style={{ color: `rgba(${cfg.accentRGB}, 0.55)` }}>
                 {position}
               </p>
-              <p className="font-display text-lg font-bold" style={{ color: cfg.accentHex }}>
+              <p className="font-display text-xl font-bold" style={{ color: cfg.accentHex }}>
                 {number}
               </p>
             </div>
           </div>
 
-          {/* Signature line */}
-          <svg className="w-full mt-1 opacity-40" height="16" viewBox="0 0 200 16">
+          {/* Signature SVG */}
+          <svg className="w-full mt-1 opacity-50" height="14" viewBox="0 0 200 14">
             <path
               d={variant === 'baseball'
-                ? 'M10 10 Q40 2 80 10 Q110 16 140 8 Q160 3 190 10'
-                : 'M10 12 Q50 4 90 11 Q120 16 150 8 Q170 3 190 12'}
+                ? 'M8 10 Q42 2 82 9 Q112 14 142 7 Q162 2 192 9'
+                : 'M8 11 Q50 3 90 10 Q120 14 152 7 Q172 2 192 11'}
               stroke={cfg.accentHex}
-              strokeWidth="1.5"
-              fill="none"
-              strokeLinecap="round"
+              strokeWidth="1.5" fill="none" strokeLinecap="round"
             />
           </svg>
         </div>
@@ -433,33 +363,33 @@ export function PremiumCard({
         {/* ── Holographic overlay (mouse-driven) ── */}
         <div
           ref={holoRef}
-          className="absolute inset-0 rounded-[14px] pointer-events-none opacity-0 transition-opacity duration-300"
-          style={{ mixBlendMode: 'screen' }}
+          className="absolute inset-0 rounded-[16px] pointer-events-none opacity-0"
+          style={{ mixBlendMode: 'screen', zIndex: 8 }}
         />
 
-        {/* ── Shine streak ── */}
+        {/* ── Moving shine streak ── */}
         <div
           ref={shineRef}
           className="absolute pointer-events-none rounded-full opacity-0"
           style={{
-            width: '40%',
-            height: '40%',
-            background: `radial-gradient(circle, rgba(${cfg.accentRGB2}, 0.25) 0%, transparent 70%)`,
-            filter: 'blur(12px)',
+            width: '45%', height: '45%',
+            background: `radial-gradient(circle, rgba(${cfg.accentRGB2}, 0.3) 0%, transparent 70%)`,
+            filter: 'blur(16px)',
             transform: 'translate(-50%, -50%)',
+            zIndex: 9,
           }}
         />
       </div>
 
-      {/* Particle CSS keyframes - injected once */}
+      {/* Injected keyframes */}
       <style>{`
         @keyframes particlePulse {
-          0%, 100% { transform: translate(-50%, -50%) scale(1);   opacity: 0.5; }
-          50%       { transform: translate(-50%, -50%) scale(2.2); opacity: 1; }
+          0%,100% { transform:translate(-50%,-50%) scale(1);   opacity:0.45; }
+          50%      { transform:translate(-50%,-50%) scale(2.5); opacity:1; }
         }
         @keyframes energyLine {
-          0%   { opacity: 0.05; }
-          100% { opacity: 0.35; }
+          0%   { opacity:0.04; }
+          100% { opacity:0.4; }
         }
       `}</style>
     </div>
