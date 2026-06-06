@@ -3,27 +3,20 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Flip } from 'gsap/Flip';
+import { SplitText } from 'gsap/SplitText';
 
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger, Flip);
-
-  gsap.defaults({
-    ease: 'power2.out',
-    duration: 0.8,
-  });
-
-  // Global GSAP config for smooth performance
+  gsap.registerPlugin(ScrollTrigger, Flip, SplitText);
+  gsap.defaults({ ease: 'power2.out', duration: 0.8 });
   gsap.config({ force3D: true, nullTargetWarn: false });
 }
 
-export { gsap, ScrollTrigger, Flip };
+export { gsap, ScrollTrigger, Flip, SplitText };
 
-// Shared eases
-export const EASE_OUT_EXPO  = 'power4.out';
-export const EASE_INOUT     = 'power2.inOut';
-export const EASE_ELASTIC   = 'elastic.out(1, 0.4)';
+export const EASE_OUT_EXPO = 'power4.out';
+export const EASE_INOUT    = 'power2.inOut';
+export const EASE_ELASTIC  = 'elastic.out(1, 0.4)';
 
-// Cinematic fade-in for any element
 export function fadeInUp(el: Element | null, delay = 0, duration = 1) {
   if (!el) return;
   return gsap.fromTo(el,
@@ -32,7 +25,6 @@ export function fadeInUp(el: Element | null, delay = 0, duration = 1) {
   );
 }
 
-// Card emergence from darkness
 export function cardReveal(el: Element | null, delay = 0) {
   if (!el) return;
   return gsap.fromTo(el,
@@ -42,7 +34,6 @@ export function cardReveal(el: Element | null, delay = 0) {
   );
 }
 
-// Stagger children with cinematic feel
 export function staggerReveal(container: Element | null, selector = ':scope > *', stagger = 0.1) {
   if (!container) return;
   const children = container.querySelectorAll(selector);
