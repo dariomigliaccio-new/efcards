@@ -325,3 +325,33 @@ body {
 .badge-rare       { background: rgba(74,144,217,0.15); color: #60a5fa; border: 1px solid rgba(74,144,217,0.3); }
 .badge-uncommon   { background: rgba(76,175,125,0.15); color: #6ee7b7; border: 1px solid rgba(76,175,125,0.3); }
 .badge-common     { background: rgba(255,255,255,0.06); color: var(--text-dim); border: 1px solid var(--border); }
+
+/* ─── Light section override ─────────────────────────────────────────────────── */
+.section-light {
+  --text:        #1c1814;
+  --text-dim:    rgba(28,24,20,0.55);
+  --text-faint:  rgba(28,24,20,0.3);
+  --border:      rgba(0,0,0,0.08);
+  --border-md:   rgba(0,0,0,0.15);
+  --gold:        #9a7030;
+  background:    #f5f1ea;
+  color:         #1c1814;
+}
+.section-light .text-gold { color: #9a7030; }
+.section-light .sport-card { border-color: rgba(0,0,0,0.1); box-shadow: 0 4px 24px rgba(0,0,0,0.18); }
+.section-light a.label:hover { color: #9a7030; }
+.section-light .sep-gold { opacity: 0.25; }
+
+/* ─── Pulse animation for auction countdown ──────────────────────────────────── */
+@keyframes pulse2 {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+.animate-pulse2 { animation: pulse2 1s ease-in-out infinite; }
+
+/* ─── Glow pulse for featured auction cards ──────────────────────────────────── */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(201,169,110,0.15), inset 0 0 20px rgba(201,169,110,0.04); }
+  50%       { box-shadow: 0 0 40px rgba(201,169,110,0.3),  inset 0 0 30px rgba(201,169,110,0.08); }
+}
+.animate-glow { animation: glowPulse 3s ease-in-out infinite; }
