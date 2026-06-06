@@ -28,7 +28,10 @@ async function createCheckoutSession({ listing, buyer, shipping_address }) {
     ]
   );
 
-  const [orderRows] = await pool.execute('SELECT id FROM orders ORDER BY created_at DESC LIMIT 1');
+  const [orderRows] = await pool.execute(
+    'SELECT id FROM orders WHERE buyer_id = ? AND listing_id = ? ORDER BY created_at DESC LIMIT 1',
+    [buyer.id, listing.id]
+  );
   const orderId = orderRows[0].id;
 
   const paymentIntent = await stripe.paymentIntents.create({

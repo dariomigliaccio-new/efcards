@@ -85,15 +85,16 @@ router.post('/', authenticate, async (req, res) => {
   try {
     await conn.beginTransaction();
 
-    const [result] = await conn.execute(
+    await conn.execute(
       `INSERT INTO trades (initiator_id, receiver_id, compatibility_score, message)
        VALUES (?, ?, ?, ?)`,
       [req.user.id, receiver_id, score, message]
     );
-    const tradeId = result.insertId;
 
-    // Actually MySQL returns insertId but we used UUID default — need to re-fetch
-    const [rows] = await conn.execute('SELECT id FROM trades ORDER BY created_at DESC LIMIT 1');
+    const [rows] = await conn.execute(
+      'SELECT id FROM trades WHERE initiator_id = ? ORDER BY created_at DESC LIMIT 1',
+      [req.user.id]
+    );
     const actualId = rows[0].id;
 
     for (const cardId of offered_card_ids) {

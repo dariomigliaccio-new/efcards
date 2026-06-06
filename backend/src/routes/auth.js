@@ -46,7 +46,7 @@ passport.use(new GoogleStrategy({
        VALUES (?, ?, ?, ?, ?, TRUE, NOW())`,
       [email, username.slice(0, 50), profile.displayName, profile.photos?.[0]?.value, profile.id]
     );
-    const [newUser] = await pool.execute('SELECT * FROM users WHERE id = ?', [result.insertId]);
+    const [newUser] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
     done(null, newUser[0]);
   } catch (err) {
     done(err);
@@ -84,13 +84,13 @@ router.post('/register', async (req, res) => {
     }
 
     const password_hash = await bcrypt.hash(password, 12);
-    const [result] = await pool.execute(
+    await pool.execute(
       `INSERT INTO users (email, username, display_name, password_hash, last_login)
        VALUES (?, ?, ?, ?, NOW())`,
       [email.toLowerCase(), username.toLowerCase(), display_name || username, password_hash]
     );
 
-    const [rows] = await pool.execute('SELECT * FROM users WHERE id = ?', [result.insertId]);
+    const [rows] = await pool.execute('SELECT * FROM users WHERE email = ?', [email.toLowerCase()]);
     const token = signToken(rows[0].id);
 
     res.status(201).json({ token, user: safeUser(rows[0]) });

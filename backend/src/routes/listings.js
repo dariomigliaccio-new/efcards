@@ -5,49 +5,57 @@ const { authenticate } = require('../middleware/auth');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const { sport, rarity, type, min_price, max_price, page = 1, limit = 24, sort = 'newest', q } = req.query;
-  const offset = (page - 1) * limit;
-  const params = [];
-  const conditions = ["l.status = 'active'"];
+  try {
+    const { sport, rarity, type, min_price, max_price, sort = 'newest', q } = req.query;
+    const p = Math.max(1, parseInt(req.query.page) || 1);
+    const l = Math.min(100, Math.max(1, parseInt(req.query.limit) || 24));
+    const offset = (p - 1) * l;
+    const params = [];
+    const conditions = ["l.status = 'active'"];
 
-  if (sport)     { conditions.push('c.sport = ?');          params.push(sport); }
-  if (rarity)    { conditions.push('c.rarity = ?');         params.push(rarity); }
-  if (type)      { conditions.push('l.type = ?');           params.push(type); }
-  if (min_price) { conditions.push('l.price >= ?');         params.push(parseFloat(min_price)); }
-  if (max_price) { conditions.push('l.price <= ?');         params.push(parseFloat(max_price)); }
-  if (q)         { conditions.push('c.player_name LIKE ?'); params.push(`%${q}%`); }
+    if (sport)     { conditions.push('c.sport = ?');          params.push(sport); }
+    if (rarity)    { conditions.push('c.rarity = ?');         params.push(rarity); }
+    if (type)      { conditions.push('l.`type` = ?');         params.push(type); }
+    if (min_price) { conditions.push('l.price >= ?');         params.push(parseFloat(min_price)); }
+    if (max_price) { conditions.push('l.price <= ?');         params.push(parseFloat(max_price)); }
+    if (q)         { conditions.push('c.player_name LIKE ?'); params.push(`%${q}%`); }
 
-  const orderMap = {
-    newest:    'l.created_at DESC',
-    oldest:    'l.created_at ASC',
-    price_asc: 'l.price ASC',
-    price_desc:'l.price DESC',
-    popular:   'l.views DESC',
-  };
-  const order = orderMap[sort] || 'l.created_at DESC';
+    const orderMap = {
+      newest:    'l.created_at DESC',
+      oldest:    'l.created_at ASC',
+      price_asc: 'l.price ASC',
+      price_desc:'l.price DESC',
+      popular:   'l.views DESC',
+    };
+    const order = orderMap[sort] || 'l.created_at DESC';
+    const where = conditions.join(' AND ');
 
-  const [rows] = await pool.execute(
-    `SELECT l.*, c.player_name, c.team, c.sport, c.rarity, c.image_url, c.year,
-            co.name AS collection_name,
-            u.username AS seller_username, u.avatar_url AS seller_avatar, u.rating AS seller_rating
-     FROM listings l
-     JOIN cards c ON c.id = l.card_id
-     JOIN collections co ON co.id = c.collection_id
-     JOIN users u ON u.id = l.seller_id
-     WHERE ${conditions.join(' AND ')}
-     ORDER BY l.is_featured DESC, ${order}
-     LIMIT ? OFFSET ?`,
-    [...params, parseInt(limit), offset]
-  );
+    const [rows] = await pool.execute(
+      `SELECT l.*, c.player_name, c.team, c.sport, c.rarity, c.image_url, c.year,
+              co.name AS collection_name,
+              u.username AS seller_username, u.avatar_url AS seller_avatar, u.rating AS seller_rating
+       FROM listings l
+       JOIN cards c ON c.id = l.card_id
+       JOIN collections co ON co.id = c.collection_id
+       JOIN users u ON u.id = l.seller_id
+       WHERE ${where}
+       ORDER BY l.is_featured DESC, ${order}
+       LIMIT ${l} OFFSET ${offset}`,
+      params
+    );
 
-  const [[{ total }]] = await pool.execute(
-    `SELECT COUNT(*) AS total FROM listings l
-     JOIN cards c ON c.id = l.card_id
-     WHERE ${conditions.join(' AND ')}`,
-    params
-  );
+    const [[{ total }]] = await pool.execute(
+      `SELECT COUNT(*) AS total FROM listings l
+       JOIN cards c ON c.id = l.card_id
+       WHERE ${where}`,
+      params
+    );
 
-  res.json({ listings: rows, total, page: parseInt(page), limit: parseInt(limit) });
+    res.json({ listings: rows, total, page: p, limit: l });
+  } catch (err) {
+    console.error('GET /listings error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch listings' });
+  }
 });
 
 router.get('/:id', async (req, res) => {
@@ -79,7 +87,8 @@ router.post('/', authenticate, async (req, res) => {
   );
 
   const [rows] = await pool.execute(
-    `SELECT l.id FROM listings ORDER BY created_at DESC LIMIT 1`
+    'SELECT id FROM listings WHERE seller_id = ? AND card_id = ? ORDER BY created_at DESC LIMIT 1',
+    [req.user.id, card_id]
   );
   res.status(201).json({ listing_id: rows[0].id, message: 'Listing submitted for review' });
 });

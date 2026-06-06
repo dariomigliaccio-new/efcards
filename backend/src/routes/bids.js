@@ -7,30 +7,37 @@ const router = express.Router();
 
 // Active auctions
 router.get('/', async (req, res) => {
-  const { sport, rarity, featured, page = 1, limit = 12 } = req.query;
-  const offset = (page - 1) * limit;
-  const params = [];
-  const conditions = ["a.status = 'active'"];
+  try {
+    const { sport, rarity, featured } = req.query;
+    const p = Math.max(1, parseInt(req.query.page) || 1);
+    const l = Math.min(50, Math.max(1, parseInt(req.query.limit) || 12));
+    const offset = (p - 1) * l;
+    const params = [];
+    const conditions = ["a.status = 'active'"];
 
-  if (sport)    { conditions.push('c.sport = ?');  params.push(sport); }
-  if (rarity)   { conditions.push('c.rarity = ?'); params.push(rarity); }
-  if (featured) { conditions.push('a.is_featured = TRUE'); }
+    if (sport)    { conditions.push('c.sport = ?');  params.push(sport); }
+    if (rarity)   { conditions.push('c.rarity = ?'); params.push(rarity); }
+    if (featured) { conditions.push('a.is_featured = TRUE'); }
 
-  const [rows] = await pool.execute(
-    `SELECT a.*, c.player_name, c.team, c.sport, c.rarity, c.image_url,
-            co.name AS collection_name,
-            u.username AS seller_username, u.avatar_url AS seller_avatar,
-            TIMESTAMPDIFF(SECOND, NOW(), a.ends_at) AS seconds_remaining
-     FROM auctions a
-     JOIN cards c ON c.id = a.card_id
-     JOIN collections co ON co.id = c.collection_id
-     JOIN users u ON u.id = a.seller_id
-     WHERE ${conditions.join(' AND ')}
-     ORDER BY a.is_featured DESC, a.ends_at ASC
-     LIMIT ? OFFSET ?`,
-    [...params, parseInt(limit), offset]
-  );
-  res.json({ auctions: rows });
+    const [rows] = await pool.execute(
+      `SELECT a.*, c.player_name, c.team, c.sport, c.rarity, c.image_url,
+              co.name AS collection_name,
+              u.username AS seller_username, u.avatar_url AS seller_avatar,
+              TIMESTAMPDIFF(SECOND, NOW(), a.ends_at) AS seconds_remaining
+       FROM auctions a
+       JOIN cards c ON c.id = a.card_id
+       JOIN collections co ON co.id = c.collection_id
+       JOIN users u ON u.id = a.seller_id
+       WHERE ${conditions.join(' AND ')}
+       ORDER BY a.is_featured DESC, a.ends_at ASC
+       LIMIT ${l} OFFSET ${offset}`,
+      params
+    );
+    res.json({ auctions: rows });
+  } catch (err) {
+    console.error('GET /auctions error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch auctions' });
+  }
 });
 
 // Single auction
@@ -148,7 +155,10 @@ router.post('/', authenticate, async (req, res) => {
       [req.user.id, card_id, buy_now_price || null, description]
     );
 
-    const [lRows] = await conn.execute('SELECT id FROM listings ORDER BY created_at DESC LIMIT 1');
+    const [lRows] = await conn.execute(
+      'SELECT id FROM listings WHERE seller_id = ? AND card_id = ? ORDER BY created_at DESC LIMIT 1',
+      [req.user.id, card_id]
+    );
     const listingId = lRows[0].id;
 
     await conn.execute(
@@ -165,7 +175,10 @@ router.post('/', authenticate, async (req, res) => {
     );
 
     await conn.commit();
-    const [aRows] = await pool.execute('SELECT * FROM auctions ORDER BY created_at DESC LIMIT 1');
+    const [aRows] = await pool.execute(
+      'SELECT * FROM auctions WHERE seller_id = ? AND card_id = ? ORDER BY created_at DESC LIMIT 1',
+      [req.user.id, card_id]
+    );
     res.status(201).json({ auction: aRows[0] });
   } catch (err) {
     await conn.rollback();

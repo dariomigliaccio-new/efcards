@@ -29,27 +29,34 @@ router.patch('/me', authenticate, async (req, res) => {
 });
 
 router.get('/:userId/collection', async (req, res) => {
-  const { status, sport, rarity, page = 1, limit = 24 } = req.query;
-  const offset = (page - 1) * limit;
-  const params = [req.params.userId];
-  let where = 'uc.user_id = ?';
+  try {
+    const { status, sport, rarity } = req.query;
+    const p = Math.max(1, parseInt(req.query.page) || 1);
+    const l = Math.min(100, Math.max(1, parseInt(req.query.limit) || 24));
+    const offset = (p - 1) * l;
+    const params = [req.params.userId];
+    let where = 'uc.user_id = ?';
 
-  if (status) { where += ' AND uc.status = ?'; params.push(status); }
-  if (sport)  { where += ' AND c.sport = ?';   params.push(sport); }
-  if (rarity) { where += ' AND c.rarity = ?';  params.push(rarity); }
+    if (status) { where += ' AND uc.status = ?'; params.push(status); }
+    if (sport)  { where += ' AND c.sport = ?';   params.push(sport); }
+    if (rarity) { where += ' AND c.rarity = ?';  params.push(rarity); }
 
-  const [rows] = await pool.execute(
-    `SELECT uc.*, c.player_name, c.team, c.sport, c.rarity, c.image_url,
-            c.card_number, c.year, co.name AS collection_name
-     FROM user_cards uc
-     JOIN cards c ON c.id = uc.card_id
-     JOIN collections co ON co.id = c.collection_id
-     WHERE ${where}
-     ORDER BY uc.created_at DESC
-     LIMIT ? OFFSET ?`,
-    [...params, parseInt(limit), offset]
-  );
-  res.json({ cards: rows });
+    const [rows] = await pool.execute(
+      `SELECT uc.*, c.player_name, c.team, c.sport, c.rarity, c.image_url,
+              c.card_number, c.year, co.name AS collection_name
+       FROM user_cards uc
+       JOIN cards c ON c.id = uc.card_id
+       JOIN collections co ON co.id = c.collection_id
+       WHERE ${where}
+       ORDER BY uc.created_at DESC
+       LIMIT ${l} OFFSET ${offset}`,
+      params
+    );
+    res.json({ cards: rows });
+  } catch (err) {
+    console.error('GET /users/:id/collection error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch collection' });
+  }
 });
 
 router.get('/:userId/reviews', async (req, res) => {

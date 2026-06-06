@@ -8,50 +8,50 @@ USE cardmatch;
 -- USERS
 -- ─────────────────────────────────────────
 CREATE TABLE users (
-  id            VARCHAR(36)  PRIMARY KEY DEFAULT (UUID()),
-  email         VARCHAR(255) UNIQUE NOT NULL,
-  username      VARCHAR(50)  UNIQUE NOT NULL,
-  display_name  VARCHAR(100),
-  avatar_url    VARCHAR(500),
-  bio           TEXT,
-  location      VARCHAR(100),
-  google_id     VARCHAR(100) UNIQUE,
-  apple_id      VARCHAR(100) UNIQUE,
-  password_hash VARCHAR(255),
-  role          ENUM('user','admin','moderator') DEFAULT 'user',
-  is_verified   BOOLEAN DEFAULT FALSE,
-  is_active     BOOLEAN DEFAULT TRUE,
+  id                 VARCHAR(36)  PRIMARY KEY DEFAULT (UUID()),
+  email              VARCHAR(255) UNIQUE NOT NULL,
+  username           VARCHAR(50)  UNIQUE NOT NULL,
+  display_name       VARCHAR(100),
+  avatar_url         VARCHAR(500),
+  bio                TEXT,
+  location           VARCHAR(100),
+  google_id          VARCHAR(100) UNIQUE,
+  apple_id           VARCHAR(100) UNIQUE,
+  password_hash      VARCHAR(255),
+  role               ENUM('user','admin','moderator') DEFAULT 'user',
+  is_verified        BOOLEAN DEFAULT FALSE,
+  is_active          BOOLEAN DEFAULT TRUE,
   stripe_customer_id VARCHAR(100),
-  rating        DECIMAL(3,2) DEFAULT 0.00,
-  rating_count  INT          DEFAULT 0,
-  total_trades  INT          DEFAULT 0,
-  total_sales   INT          DEFAULT 0,
-  created_at    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
-  updated_at    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  last_login    TIMESTAMP    NULL
+  rating             DECIMAL(3,2) DEFAULT 0.00,
+  rating_count       INT          DEFAULT 0,
+  total_trades       INT          DEFAULT 0,
+  total_sales        INT          DEFAULT 0,
+  created_at         TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+  updated_at         TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  last_login         TIMESTAMP    NULL
 );
 
 -- ─────────────────────────────────────────
--- COLLECTIONS  (e.g. "2022 Panini World Cup")
+-- COLLECTIONS
 -- ─────────────────────────────────────────
 CREATE TABLE collections (
-  id            VARCHAR(36)  PRIMARY KEY DEFAULT (UUID()),
-  name          VARCHAR(200) NOT NULL,
-  description   TEXT,
-  sport         ENUM('soccer','baseball','basketball','football','other') NOT NULL,
-  year          YEAR         NOT NULL,
-  manufacturer  VARCHAR(100),
-  total_cards   INT,
-  image_url     VARCHAR(500),
-  is_active     BOOLEAN      DEFAULT TRUE,
-  created_by    VARCHAR(36),
-  created_at    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
-  updated_at    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  id           VARCHAR(36)  PRIMARY KEY DEFAULT (UUID()),
+  name         VARCHAR(200) NOT NULL,
+  description  TEXT,
+  sport        ENUM('soccer','baseball','basketball','football','other') NOT NULL,
+  year         YEAR         NOT NULL,
+  manufacturer VARCHAR(100),
+  total_cards  INT,
+  image_url    VARCHAR(500),
+  is_active    BOOLEAN      DEFAULT TRUE,
+  created_by   VARCHAR(36),
+  created_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+  updated_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- ─────────────────────────────────────────
--- CARDS / STICKERS
+-- CARDS
 -- ─────────────────────────────────────────
 CREATE TABLE cards (
   id              VARCHAR(36)  PRIMARY KEY DEFAULT (UUID()),
@@ -86,15 +86,15 @@ CREATE TABLE cards (
 -- USER CARD COLLECTION  (have / need / duplicate)
 -- ─────────────────────────────────────────
 CREATE TABLE user_cards (
-  id         VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-  user_id    VARCHAR(36) NOT NULL,
-  card_id    VARCHAR(36) NOT NULL,
-  status     ENUM('have','need','duplicate') NOT NULL,
-  condition  ENUM('mint','near_mint','excellent','good','poor') DEFAULT 'near_mint',
-  quantity   INT         DEFAULT 1,
-  notes      TEXT,
-  created_at TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  id          VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  user_id     VARCHAR(36) NOT NULL,
+  card_id     VARCHAR(36) NOT NULL,
+  status      ENUM('have','need','duplicate') NOT NULL,
+  `condition` ENUM('mint','near_mint','excellent','good','poor') DEFAULT 'near_mint',
+  quantity    INT         DEFAULT 1,
+  notes       TEXT,
+  created_at  TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+  updated_at  TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY uq_user_card_status (user_id, card_id, status),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE CASCADE,
@@ -151,7 +151,7 @@ CREATE TABLE trade_items (
 );
 
 -- ─────────────────────────────────────────
--- MESSAGES  (trade chat + DM)
+-- MESSAGES
 -- ─────────────────────────────────────────
 CREATE TABLE trade_messages (
   id         VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
@@ -185,10 +185,10 @@ CREATE TABLE listings (
   id          VARCHAR(36)  PRIMARY KEY DEFAULT (UUID()),
   seller_id   VARCHAR(36)  NOT NULL,
   card_id     VARCHAR(36)  NOT NULL,
-  type        ENUM('fixed','offer','auction') NOT NULL DEFAULT 'fixed',
+  `type`      ENUM('fixed','offer','auction') NOT NULL DEFAULT 'fixed',
   price       DECIMAL(10,2),
   min_offer   DECIMAL(10,2),
-  condition   ENUM('mint','near_mint','excellent','good','poor') DEFAULT 'near_mint',
+  `condition` ENUM('mint','near_mint','excellent','good','poor') DEFAULT 'near_mint',
   description TEXT,
   images      JSON,
   status      ENUM('active','pending','sold','cancelled','blocked') DEFAULT 'pending',
@@ -204,19 +204,19 @@ CREATE TABLE listings (
   INDEX idx_seller (seller_id),
   INDEX idx_card   (card_id),
   INDEX idx_status (status),
-  INDEX idx_type   (type)
+  INDEX idx_type   (`type`)
 );
 
 CREATE TABLE offers (
-  id         VARCHAR(36)  PRIMARY KEY DEFAULT (UUID()),
-  listing_id VARCHAR(36)  NOT NULL,
-  buyer_id   VARCHAR(36)  NOT NULL,
+  id         VARCHAR(36)   PRIMARY KEY DEFAULT (UUID()),
+  listing_id VARCHAR(36)   NOT NULL,
+  buyer_id   VARCHAR(36)   NOT NULL,
   amount     DECIMAL(10,2) NOT NULL,
   message    TEXT,
   status     ENUM('pending','accepted','declined','countered','expired') DEFAULT 'pending',
-  expires_at TIMESTAMP    NULL,
-  created_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  expires_at TIMESTAMP     NULL,
+  created_at TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE,
   FOREIGN KEY (buyer_id)   REFERENCES users(id)
 );
@@ -225,11 +225,11 @@ CREATE TABLE offers (
 -- ORDERS
 -- ─────────────────────────────────────────
 CREATE TABLE orders (
-  id                       VARCHAR(36)  PRIMARY KEY DEFAULT (UUID()),
-  buyer_id                 VARCHAR(36)  NOT NULL,
-  seller_id                VARCHAR(36)  NOT NULL,
+  id                       VARCHAR(36)   PRIMARY KEY DEFAULT (UUID()),
+  buyer_id                 VARCHAR(36)   NOT NULL,
+  seller_id                VARCHAR(36)   NOT NULL,
   listing_id               VARCHAR(36),
-  card_id                  VARCHAR(36)  NOT NULL,
+  card_id                  VARCHAR(36)   NOT NULL,
   amount                   DECIMAL(10,2) NOT NULL,
   platform_fee             DECIMAL(10,2),
   seller_amount            DECIMAL(10,2),
@@ -257,24 +257,24 @@ CREATE TABLE orders (
 -- AUCTIONS
 -- ─────────────────────────────────────────
 CREATE TABLE auctions (
-  id              VARCHAR(36)   PRIMARY KEY DEFAULT (UUID()),
-  listing_id      VARCHAR(36)   NOT NULL,
-  seller_id       VARCHAR(36)   NOT NULL,
-  card_id         VARCHAR(36)   NOT NULL,
-  start_price     DECIMAL(10,2) NOT NULL,
-  reserve_price   DECIMAL(10,2),
-  current_price   DECIMAL(10,2) NOT NULL,
-  buy_now_price   DECIMAL(10,2),
-  min_increment   DECIMAL(10,2) DEFAULT 1.00,
-  status          ENUM('scheduled','active','ended','cancelled') DEFAULT 'scheduled',
-  starts_at       TIMESTAMP     NOT NULL,
-  ends_at         TIMESTAMP     NOT NULL,
-  winner_id       VARCHAR(36),
-  winner_bid_id   VARCHAR(36),
-  bid_count       INT           DEFAULT 0,
-  is_featured     BOOLEAN       DEFAULT FALSE,
-  created_at      TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
-  updated_at      TIMESTAMP     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  id            VARCHAR(36)   PRIMARY KEY DEFAULT (UUID()),
+  listing_id    VARCHAR(36)   NOT NULL,
+  seller_id     VARCHAR(36)   NOT NULL,
+  card_id       VARCHAR(36)   NOT NULL,
+  start_price   DECIMAL(10,2) NOT NULL,
+  reserve_price DECIMAL(10,2),
+  current_price DECIMAL(10,2) NOT NULL,
+  buy_now_price DECIMAL(10,2),
+  min_increment DECIMAL(10,2) DEFAULT 1.00,
+  status        ENUM('scheduled','active','ended','cancelled') DEFAULT 'scheduled',
+  starts_at     TIMESTAMP     NOT NULL,
+  ends_at       TIMESTAMP     NOT NULL,
+  winner_id     VARCHAR(36),
+  winner_bid_id VARCHAR(36),
+  bid_count     INT           DEFAULT 0,
+  is_featured   BOOLEAN       DEFAULT FALSE,
+  created_at    TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (listing_id) REFERENCES listings(id),
   FOREIGN KEY (seller_id)  REFERENCES users(id),
   FOREIGN KEY (card_id)    REFERENCES cards(id),
@@ -283,13 +283,13 @@ CREATE TABLE auctions (
 );
 
 CREATE TABLE bids (
-  id            VARCHAR(36)   PRIMARY KEY DEFAULT (UUID()),
-  auction_id    VARCHAR(36)   NOT NULL,
-  bidder_id     VARCHAR(36)   NOT NULL,
-  amount        DECIMAL(10,2) NOT NULL,
-  is_winning    BOOLEAN       DEFAULT FALSE,
-  auto_bid_max  DECIMAL(10,2),
-  created_at    TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
+  id           VARCHAR(36)   PRIMARY KEY DEFAULT (UUID()),
+  auction_id   VARCHAR(36)   NOT NULL,
+  bidder_id    VARCHAR(36)   NOT NULL,
+  amount       DECIMAL(10,2) NOT NULL,
+  is_winning   BOOLEAN       DEFAULT FALSE,
+  auto_bid_max DECIMAL(10,2),
+  created_at   TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE CASCADE,
   FOREIGN KEY (bidder_id)  REFERENCES users(id),
   INDEX idx_auction (auction_id),
@@ -342,7 +342,7 @@ CREATE TABLE reviews (
   trade_id    VARCHAR(36),
   rating      INT         NOT NULL CHECK (rating BETWEEN 1 AND 5),
   comment     TEXT,
-  type        ENUM('sale','trade') NOT NULL,
+  `type`      ENUM('sale','trade') NOT NULL,
   created_at  TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uq_review (reviewer_id, order_id),
   FOREIGN KEY (reviewer_id) REFERENCES users(id),
@@ -357,7 +357,7 @@ CREATE TABLE reviews (
 CREATE TABLE notifications (
   id         VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   user_id    VARCHAR(36) NOT NULL,
-  type       ENUM(
+  `type`     ENUM(
                'trade_request','trade_accepted','trade_declined','trade_completed',
                'bid_received','bid_outbid','auction_won','auction_ended',
                'offer_received','offer_accepted','offer_declined',
@@ -395,7 +395,7 @@ CREATE TABLE verification_tokens (
   id         VARCHAR(36)  PRIMARY KEY DEFAULT (UUID()),
   user_id    VARCHAR(36)  NOT NULL,
   token      VARCHAR(255) UNIQUE NOT NULL,
-  type       ENUM('email_verify','password_reset') NOT NULL,
+  `type`     ENUM('email_verify','password_reset') NOT NULL,
   expires_at TIMESTAMP    NOT NULL,
   created_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -404,7 +404,7 @@ CREATE TABLE verification_tokens (
 -- ─────────────────────────────────────────
 -- SEED: default admin
 -- ─────────────────────────────────────────
--- Password: Admin@CardMatch1  (bcrypt, change after first login)
+-- Password: Admin@CardMatch1  (change after first login)
 INSERT INTO users (email, username, display_name, role, is_verified, password_hash)
 VALUES (
   'admin@cardmatch.io',

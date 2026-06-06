@@ -1,5 +1,12 @@
 require('dotenv').config();
 
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled rejection:', reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err.message);
+});
+
 const express    = require('express');
 const http       = require('http');
 const { Server } = require('socket.io');

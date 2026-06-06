@@ -5,35 +5,44 @@ const { authenticate } = require('../middleware/auth');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const { sport, rarity, player, team, collection_id, year, page = 1, limit = 24, q } = req.query;
-  const offset = (page - 1) * limit;
-  const params = [];
-  const conditions = ['1=1'];
+  try {
+    const { sport, rarity, player, team, collection_id, year, q } = req.query;
+    const p = Math.max(1, parseInt(req.query.page) || 1);
+    const l = Math.min(100, Math.max(1, parseInt(req.query.limit) || 24));
+    const offset = (p - 1) * l;
+    const params = [];
+    const conditions = ['1=1'];
 
-  if (sport)         { conditions.push('c.sport = ?');            params.push(sport); }
-  if (rarity)        { conditions.push('c.rarity = ?');           params.push(rarity); }
-  if (team)          { conditions.push('c.team LIKE ?');          params.push(`%${team}%`); }
-  if (collection_id) { conditions.push('c.collection_id = ?');    params.push(collection_id); }
-  if (year)          { conditions.push('c.year = ?');             params.push(year); }
-  if (q)             { conditions.push('(c.player_name LIKE ? OR c.team LIKE ?)'); params.push(`%${q}%`, `%${q}%`); }
-  if (player)        { conditions.push('c.player_name LIKE ?');   params.push(`%${player}%`); }
+    if (sport)         { conditions.push('c.sport = ?');            params.push(sport); }
+    if (rarity)        { conditions.push('c.rarity = ?');           params.push(rarity); }
+    if (team)          { conditions.push('c.team LIKE ?');          params.push(`%${team}%`); }
+    if (collection_id) { conditions.push('c.collection_id = ?');    params.push(collection_id); }
+    if (year)          { conditions.push('c.year = ?');             params.push(parseInt(year)); }
+    if (q)             { conditions.push('(c.player_name LIKE ? OR c.team LIKE ?)'); params.push(`%${q}%`, `%${q}%`); }
+    if (player)        { conditions.push('c.player_name LIKE ?');   params.push(`%${player}%`); }
 
-  const [rows] = await pool.execute(
-    `SELECT c.*, co.name AS collection_name, co.sport AS collection_sport
-     FROM cards c
-     JOIN collections co ON co.id = c.collection_id
-     WHERE ${conditions.join(' AND ')}
-     ORDER BY c.rarity DESC, c.player_name ASC
-     LIMIT ? OFFSET ?`,
-    [...params, parseInt(limit), offset]
-  );
+    const where = conditions.join(' AND ');
 
-  const [[{ total }]] = await pool.execute(
-    `SELECT COUNT(*) AS total FROM cards c WHERE ${conditions.join(' AND ')}`,
-    params
-  );
+    const [rows] = await pool.execute(
+      `SELECT c.*, co.name AS collection_name, co.sport AS collection_sport
+       FROM cards c
+       JOIN collections co ON co.id = c.collection_id
+       WHERE ${where}
+       ORDER BY c.rarity DESC, c.player_name ASC
+       LIMIT ${l} OFFSET ${offset}`,
+      params
+    );
 
-  res.json({ cards: rows, total, page: parseInt(page), limit: parseInt(limit) });
+    const [[{ total }]] = await pool.execute(
+      `SELECT COUNT(*) AS total FROM cards c WHERE ${where}`,
+      params
+    );
+
+    res.json({ cards: rows, total, page: p, limit: l });
+  } catch (err) {
+    console.error('GET /cards error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch cards' });
+  }
 });
 
 router.get('/:id', async (req, res) => {

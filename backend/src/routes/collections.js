@@ -6,20 +6,27 @@ const { requireAdmin } = require('../middleware/admin');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const { sport, year, page = 1, limit = 20 } = req.query;
-  const offset = (page - 1) * limit;
-  const params = [];
-  const conditions = ['is_active = TRUE'];
+  try {
+    const p = Math.max(1, parseInt(req.query.page) || 1);
+    const l = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const offset = (p - 1) * l;
+    const { sport, year } = req.query;
+    const params = [];
+    const conditions = ['is_active = TRUE'];
 
-  if (sport) { conditions.push('sport = ?'); params.push(sport); }
-  if (year)  { conditions.push('year = ?');  params.push(year); }
+    if (sport) { conditions.push('sport = ?'); params.push(sport); }
+    if (year)  { conditions.push('year = ?');  params.push(parseInt(year)); }
 
-  const [rows] = await pool.execute(
-    `SELECT * FROM collections WHERE ${conditions.join(' AND ')}
-     ORDER BY year DESC, name ASC LIMIT ? OFFSET ?`,
-    [...params, parseInt(limit), offset]
-  );
-  res.json({ collections: rows });
+    const [rows] = await pool.execute(
+      `SELECT * FROM collections WHERE ${conditions.join(' AND ')}
+       ORDER BY year DESC, name ASC LIMIT ${l} OFFSET ${offset}`,
+      params
+    );
+    res.json({ collections: rows });
+  } catch (err) {
+    console.error('GET /collections error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch collections' });
+  }
 });
 
 router.get('/:id', async (req, res) => {
@@ -40,7 +47,7 @@ router.post('/', authenticate, requireAdmin, async (req, res) => {
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     [name, description, sport, year, manufacturer, total_cards, image_url, req.user.id]
   );
-  const [rows] = await pool.execute('SELECT * FROM collections WHERE id = ?', [result.insertId]);
+  const [rows] = await pool.execute('SELECT * FROM collections WHERE name = ? ORDER BY created_at DESC LIMIT 1', [name]);
   res.status(201).json({ collection: rows[0] });
 });
 
