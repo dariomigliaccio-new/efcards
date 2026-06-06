@@ -73,7 +73,7 @@ function AuctionCard({ auction, onBid }: { auction: Auction; onBid: (a: Auction)
           <div className="flex items-end justify-between mb-4">
             <div>
               <p className="text-[0.6rem] uppercase tracking-wider text-white/30 mb-0.5">Current bid</p>
-              <p className="font-display text-2xl font-medium text-gold">${auction.current_price.toFixed(2)}</p>
+              <p className="font-display text-2xl font-medium text-gold">${Number(auction.current_price).toFixed(2)}</p>
               <p className="text-[0.6rem] text-white/30">{auction.bid_count} bids</p>
             </div>
             <div className="text-right">
@@ -84,7 +84,7 @@ function AuctionCard({ auction, onBid }: { auction: Auction; onBid: (a: Auction)
 
           {auction.buy_now_price && (
             <p className="text-[0.65rem] text-white/30 mb-3">
-              Buy now: <span className="text-white/60">${auction.buy_now_price.toFixed(2)}</span>
+              Buy now: <span className="text-white/60">${Number(auction.buy_now_price).toFixed(2)}</span>
             </p>
           )}
 
@@ -101,11 +101,11 @@ function AuctionCard({ auction, onBid }: { auction: Auction; onBid: (a: Auction)
 }
 
 function BidModal({ auction, onClose }: { auction: Auction; onClose: () => void }) {
-  const [amount, setAmount] = useState(auction.current_price + auction.min_increment);
+  const [amount, setAmount] = useState(Number(auction.current_price) + Number(auction.min_increment));
   const [loading, setLoading] = useState(false);
 
   async function submit() {
-    if (amount <= auction.current_price) return toast.error('Bid must be higher than current price');
+    if (amount <= Number(auction.current_price)) return toast.error('Bid must be higher than current price');
     setLoading(true);
     try {
       await api.post(`/auctions/${auction.id}/bid`, { amount });
@@ -128,19 +128,19 @@ function BidModal({ auction, onClose }: { auction: Auction; onClose: () => void 
 
         <div className="flex justify-between text-sm mb-4">
           <span className="text-dim">Current bid</span>
-          <span className="text-gold font-medium">${auction.current_price.toFixed(2)}</span>
+          <span className="text-gold font-medium">${Number(auction.current_price).toFixed(2)}</span>
         </div>
         <div className="flex justify-between text-sm mb-6">
           <span className="text-dim">Min increment</span>
-          <span>${auction.min_increment.toFixed(2)}</span>
+          <span>${Number(auction.min_increment).toFixed(2)}</span>
         </div>
 
         <label className="label text-[0.6rem] block mb-2">Your bid</label>
         <input
           type="number"
           className="input-base mb-4"
-          min={auction.current_price + auction.min_increment}
-          step={auction.min_increment}
+          min={Number(auction.current_price) + Number(auction.min_increment)}
+          step={Number(auction.min_increment)}
           value={amount}
           onChange={(e) => setAmount(parseFloat(e.target.value))}
         />
@@ -148,7 +148,7 @@ function BidModal({ auction, onClose }: { auction: Auction; onClose: () => void 
         <div className="flex gap-3">
           <button className="btn btn-ghost flex-1 text-xs" onClick={onClose}>Cancel</button>
           <button className="btn btn-primary flex-1 text-xs" onClick={submit} disabled={loading}>
-            {loading ? 'Placing…' : `Bid $${amount.toFixed(2)}`}
+            {loading ? 'Placing…' : `Bid $${Number(amount).toFixed(2)}`}
           </button>
         </div>
       </div>

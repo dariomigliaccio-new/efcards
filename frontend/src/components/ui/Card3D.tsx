@@ -116,7 +116,7 @@ export function Card3D({
                 {isAuction ? 'Current bid' : 'Price'}
               </p>
               <p className="text-sm font-medium text-gold">
-                ${(isAuction ? currentBid : price)?.toFixed(2)}
+                ${Number(isAuction ? currentBid : price).toFixed(2)}
               </p>
             </div>
             {isAuction && endsAt && (
